@@ -4,17 +4,20 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    ssl: {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_NAME || 'defaultdb',
+    ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: false // Cần thiết cho Aiven với ssl-mode=REQUIRED
-    },
+    } : false,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    acquireTimeout: 60000,
+    timeout: 60000,
+    reconnect: true
 });
 
 // Tạo bảng contacts nếu chưa tồn tại
