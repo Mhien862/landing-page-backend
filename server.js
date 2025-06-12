@@ -29,10 +29,29 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://landing-page-web-frontend.vercel.app/', 'https://localhost:5173'] 
-    : '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Allow all localhost requests and all vercel.app domains
+    if (origin.includes('localhost') || origin.includes('vercel.app') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // In production, be more restrictive
+    const allowedOrigins = [
+      'https://landing-page-web-frontend.vercel.app',
+      'https://localhost:5173',
+      'http://localhost:5173'
+    ];
+    
+    if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    return callback(null, true); // For now, allow all origins
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   credentials: true,
   preflightContinue: false,
