@@ -18,16 +18,20 @@ dotenv.config();
 // Khởi tạo app Express
 const app = express();
 
-// Logging middleware để debug
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
-  next();
-});
+// Logging middleware để debug (chỉ trong development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log('Headers:', req.headers);
+    next();
+  });
+}
 
 // Middleware
 app.use(cors({
-  origin: '*', // Cho phép tất cả các domain
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.vercel.app', 'https://localhost:5173'] 
+    : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   credentials: true,
@@ -37,11 +41,13 @@ app.use(cors({
 
 app.use(express.json()); // Cho phép server đọc dữ liệu JSON từ request body
 
-// Middleware để log body của request
-app.use((req, res, next) => {
-  console.log('Request body:', req.body);
-  next();
-});
+// Middleware để log body của request (chỉ trong development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log('Request body:', req.body);
+    next();
+  });
+}
 
 // Khởi tạo database và tạo bảng
 const initializeDatabase = async () => {
