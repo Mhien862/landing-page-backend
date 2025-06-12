@@ -30,7 +30,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app', 'https://localhost:5173'] 
+    ? ['https://landing-page-web-frontend.vercel.app/', 'https://localhost:5173'] 
     : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
